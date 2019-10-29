@@ -25,13 +25,13 @@ public:
 private slots:
     void on_btnSalir_clicked();
 
-    void on_btnAgregarAlumno_clicked();
+    //void on_btnAgregarAlumno_clicked();
 
     void on_btnBuscarAlumno_clicked();
 
     void on_btnAgregar_clicked();
 
-    void on_txtBuscar_textChanged(const QString &arg1);
+    //void on_txtBuscar_textChanged(const QString &arg1);
 
     void on_btnCalcular_clicked();
 

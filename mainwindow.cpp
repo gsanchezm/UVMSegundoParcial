@@ -26,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
         ui->txtBuscar->setEnabled(false);
         ui->btnCalcular->setEnabled(false);
     }
+
+    ui->lblNombreVacio->setStyleSheet("QLabel { color : red; }");
+    ui->lblItemExist->setStyleSheet("QLabel { color : red; }");
 }
 
 MainWindow::~MainWindow()
@@ -70,40 +73,57 @@ void MainWindow::on_btnBuscarAlumno_clicked()
 
 void MainWindow::on_btnAgregar_clicked()
 {
-    int row = ui->tblAlumnnos->rowCount();
-    ui->tblAlumnnos->insertRow(row);
-    //alumno *student = new alumno[100];
-    cantidad ++;
+    if(!ui->txtNombre->text().isEmpty()){
+        int row = ui->tblAlumnnos->rowCount();
 
-    ui->tblAlumnnos->setItem(row,ID, new QTableWidgetItem(QString::number(cantidad)));
-    ui->tblAlumnnos->setItem(row,NOMBRE, new QTableWidgetItem(nombre()));
-    ui->tblAlumnnos->setItem(row,MATERIA, new QTableWidgetItem(materia()));
-    ui->tblAlumnnos->setItem(row,PARCIAL, new QTableWidgetItem(parcial()));
-    ui->tblAlumnnos->setItem(row,CALIFICACION, new QTableWidgetItem(QString::number(calificacion())));
+        QList<QTableWidgetItem *> ItemNombreList = ui->tblAlumnnos->findItems(nombre(), Qt::MatchExactly);
+        QList<QTableWidgetItem *> ItemMateriaList = ui->tblAlumnnos->findItems(materia(), Qt::MatchExactly);
+        QList<QTableWidgetItem *> ItemParcialList = ui->tblAlumnnos->findItems(parcial(), Qt::MatchExactly);
 
-    ui->tblAlumnnos->viewport()->update();
-    ui->btnBuscarAlumno->setEnabled(true);
-    ui->txtBuscar->setEnabled(true);
-    ui->btnCalcular->setEnabled(true);
+        if(ItemNombreList.count()>0 & ItemMateriaList.count() > 0 & ItemParcialList.count() > 0){
+            ui->lblItemExist->setText("El nombre, la materia y el parcial ya fueron registrados!");
+        }else{
+            ui->lblItemExist->setText("");
 
-    student[cantidad].id = cantidad;
-    student[cantidad].nombre = ui->txtNombre->text().toStdString();
-    student[cantidad].materia = ui->cmbMaterias->currentText().toStdString();
-    student[cantidad].parcial = ui->cmbParciales->currentText().toStdString();
-    student[cantidad].calificacion = ui->dsbCalificacion->value();
+            ui->tblAlumnnos->insertRow(row);
+            cantidad ++;
 
-    ui->txtNombre->clear();
-    ui->cmbMaterias->clear();
-    ui->cmbMaterias->addItems({"Programación","Circuitos","Prácticas Profesionales"});
-    ui->cmbParciales->clear();
-    for(int i = 1; i<=3;i++){
-        ui->cmbParciales->addItem("Parcial " + QString::number(i));
-    }
-    ui->dsbCalificacion->clear();
-    ui->dsbCalificacion->setValue(0.0);
+            ui->tblAlumnnos->setItem(row,ID, new QTableWidgetItem(QString::number(cantidad)));
+            ui->tblAlumnnos->setItem(row,NOMBRE, new QTableWidgetItem(nombre()));
+            ui->tblAlumnnos->setItem(row,MATERIA, new QTableWidgetItem(materia()));
+            ui->tblAlumnnos->setItem(row,PARCIAL, new QTableWidgetItem(parcial()));
+            ui->tblAlumnnos->setItem(row,CALIFICACION, new QTableWidgetItem(QString::number(calificacion())));
 
-    if(cantidad>100){
-        ui->btnAgregar->setEnabled(false);
+            ui->btnBuscarAlumno->setEnabled(true);
+            ui->txtBuscar->setEnabled(true);
+            ui->btnCalcular->setEnabled(true);
+
+            student[cantidad].id = cantidad;
+            student[cantidad].nombre = ui->txtNombre->text().toStdString();
+            student[cantidad].materia = ui->cmbMaterias->currentText().toStdString();
+            student[cantidad].parcial = ui->cmbParciales->currentText().toStdString();
+            student[cantidad].calificacion = ui->dsbCalificacion->value();
+
+            ui->txtNombre->clear();
+            ui->cmbMaterias->clear();
+            ui->cmbMaterias->addItems({"Programación","Circuitos","Prácticas Profesionales"});
+            ui->cmbParciales->clear();
+            for(int i = 1; i<=3;i++){
+                ui->cmbParciales->addItem("Parcial " + QString::number(i));
+            }
+            ui->dsbCalificacion->clear();
+            ui->dsbCalificacion->setValue(0.0);
+
+            if(cantidad>=98){
+                ui->btnAgregar->setEnabled(false);
+                row=0;
+                cantidad=0;
+            }
+        }
+
+        ui->lblNombreVacio->setText("");
+    }else{
+        ui->lblNombreVacio->setText("El nombre no puede estar vacío!");
     }
 }
 
@@ -143,9 +163,10 @@ void MainWindow::on_btnCalcular_clicked()
     }
 
     promedio = sumatoria/cantidad;
-    promCircuitos = calCircuitos/cantidadCircuitos;
-    promProgramacion = calProgramacion/cantidadProgramacion;
-    promPracticas = calPracticas/cantidadPracticas;
+
+    promCircuitos = cantidadCircuitos>0&calCircuitos>0?calCircuitos/cantidadCircuitos:0;
+    promProgramacion = calProgramacion>0&cantidadPracticas>0?calProgramacion/cantidadProgramacion:0;
+    promPracticas = calPracticas>0&cantidadPracticas>0?calPracticas/cantidadPracticas:0;
 
     ui->lblPromGeneral->setText(QString::number(promedio,'f',2));
     ui->lblMejorCal->setText(QString::number(highNum));
